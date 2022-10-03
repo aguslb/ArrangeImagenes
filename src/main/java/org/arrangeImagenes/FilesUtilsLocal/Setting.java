@@ -28,14 +28,13 @@ public class Setting {
 
     private String scramblePath;
 
+    private String resultPath;
+
     private File dirResult;
 
     private Path originalPath;
 
-    private Path resultPath;
-
     private List<Path> files;
-
 
     public Setting() {
         properties = ReadProperties.readPropertiesFile();
@@ -43,7 +42,7 @@ public class Setting {
         if (!dirResult.exists())
             FilesUtilsLocal.createPath(dirResult.getAbsolutePath());
         scramblePath = properties.getProperty("ORIGINAL_PATH");
-        resultPath = dirResult.toPath();
+        resultPath = getResultPath();
         originalPath = Paths.get(getScramblePath());
         files = calculateListOfFiles();
         totalPathFiles = files.size();
@@ -57,6 +56,10 @@ public class Setting {
 
     public String getScramblePath() {
         return scramblePath;
+    }
+
+    public String getResultPath() {
+        return resultPath;
     }
 
     public Path getOriginalPath() {
@@ -76,30 +79,12 @@ public class Setting {
     }
 
     private List<Path> calculateListOfFiles() {
-        return getDirOrFiles(true);
-    }
-
-    private List<Path> getDirOrFiles(boolean isFileOrDir) {
         List<Path> localFiles = new ArrayList<>();
         try {
-            if (isFileOrDir) {
-                localFiles = Files.walk(getOriginalPath()).filter(Files::isRegularFile).collect(Collectors.toList());
-            } else {
-                localFiles = Files.walk(getResultPath()).filter(Files::isDirectory).collect(Collectors.toList());
-            }
-
+            localFiles = Files.walk(getOriginalPath()).filter(Files::isRegularFile).collect(Collectors.toList());
         } catch (IOException ioException) {
             logger.log(Level.SEVERE, "Error getting the list off Files");
         }
         return localFiles;
     }
-
-    public List<Path> calculateListOfPaths() {
-        return getDirOrFiles(false);
-    }
-
-    public Path getResultPath() {
-        return resultPath;
-    }
-
 }
