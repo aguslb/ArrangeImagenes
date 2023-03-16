@@ -4,9 +4,8 @@ import com.thebuzzmedia.exiftool.ExifTool;
 import com.thebuzzmedia.exiftool.ExifToolBuilder;
 import com.thebuzzmedia.exiftool.Tag;
 import com.thebuzzmedia.exiftool.core.StandardTag;
+import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.arrangeImagenes.Main;
-import org.arrangeImagenes.ReadProperties;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -19,22 +18,22 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@AllArgsConstructor
 public class ExifToolUtil {
-    Logger logger = Logger.getLogger(ExifToolUtil.class.getName());
-    private Properties properties = ReadProperties.readPropertiesFile();
+    static Logger logger = Logger.getLogger(ExifToolUtil.class.getName());
+    String propertiesResultPath;
+    File file;
 
     /**
-     *
      * @param file
      * @return
      */
     public synchronized String getNewPathFromTags(File file) {
         List<String> retPathName = getDataFromTags(file);
-        return properties.getProperty("RESULT_PATH") + retPathName.get(0).toUpperCase() + File.separator + retPathName.get(1).toUpperCase() + File.separator + retPathName.get(2).toUpperCase();
+        return propertiesResultPath + retPathName.get(0).toUpperCase() + File.separator + retPathName.get(1).toUpperCase() + File.separator + retPathName.get(2).toUpperCase();
     }
 
     /**
-     *
      * @param file
      * @return
      */
@@ -44,7 +43,6 @@ public class ExifToolUtil {
     }
 
     /**
-     *
      * @param file
      * @return
      */
@@ -68,7 +66,6 @@ public class ExifToolUtil {
     }
 
     /**
-     *
      * @param filePath
      * @return
      * @throws Exception
@@ -91,7 +88,7 @@ public class ExifToolUtil {
             BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
             while ((line = in.readLine()) != null) {
                 line = line.toLowerCase();
-                if (line.indexOf("date") >= 0) {
+                if (line.contains("date")) {
                     int colonIndexOf = line.indexOf(colon);
                     line = line.substring(colonIndexOf + 2);
                     if (line.length() >= 10) {
@@ -119,12 +116,11 @@ public class ExifToolUtil {
     }
 
     /**
-     *
      * @param image
      * @return
      * @throws Exception
      */
-    private static Map<Tag, String> parse(File image) throws Exception {
+    private  Map<Tag, String> parse(File image) throws Exception {
         // ExifTool path must be defined as a system property (`exiftool.path`),
         // but path can be set using `withPath` method.
         try (ExifTool exifTool = new ExifToolBuilder().build()) {
