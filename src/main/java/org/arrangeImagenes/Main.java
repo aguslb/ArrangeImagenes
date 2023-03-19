@@ -4,26 +4,30 @@ import org.arrangeImagenes.FilesUtilsLocal.PhotoManagerThreaded;
 import org.arrangeImagenes.FilesUtilsLocal.Setting;
 import org.arrangeImagenes.FilesUtilsLocal.ThreadMonitor;
 
+import java.io.IOException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
 public class Main {
 
-    Logger logger = Logger.getLogger(Main.class.getName());
+    static Logger logger = Logger.getLogger(Main.class.getName());
 
     /**
      * @param args
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         int from = 0;
         int to;
-        Setting setting = new Setting();
+        String os = System.getProperty("os.name");
+        logger.log(Level.INFO, "Start... " + os);
+        Setting setting = new Setting(os);
         ThreadMonitor threadMonitor = new ThreadMonitor(setting.getTotalPathFiles());
         to = setting.getFilesPerThread();
         boolean nextBreak = false;
         for (int i = 0; i <= setting.getMaxThreads(); i++) {
             PhotoManagerThreaded photoManagerThreaded = new PhotoManagerThreaded(
-                    setting.getFiles().subList(from, to), threadMonitor);
+                    setting.getFiles().subList(from, to), threadMonitor, setting.getResultPathString(), setting.getExifToolFile());
             photoManagerThreaded.start();
             from += setting.getFilesPerThread() + 1;
             to = from + setting.getFilesPerThread();
