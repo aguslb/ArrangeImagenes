@@ -21,6 +21,7 @@ public class ReadProperties {
         try (InputStream input = new FileInputStream(path)) {
             // load a properties file
             prop.load(input);
+            System.setProperties(prop);
             return prop;
         } catch (IOException ex) {
             ex.printStackTrace();
