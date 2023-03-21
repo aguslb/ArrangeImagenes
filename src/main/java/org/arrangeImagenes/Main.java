@@ -2,6 +2,7 @@ package org.arrangeImagenes;
 
 import org.arrangeImagenes.FilesUtilsLocal.PhotoManagerThreaded;
 import org.arrangeImagenes.FilesUtilsLocal.Setting;
+import org.arrangeImagenes.FilesUtilsLocal.TestAmountOfThreads;
 import org.arrangeImagenes.FilesUtilsLocal.ThreadMonitor;
 
 import java.io.IOException;
@@ -16,7 +17,8 @@ public class Main {
     /**
      * @param args
      */
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
+        //TestAmountOfThreads.maxThreads();
         int from = 0;
         int to;
         String os = System.getProperty("os.name");

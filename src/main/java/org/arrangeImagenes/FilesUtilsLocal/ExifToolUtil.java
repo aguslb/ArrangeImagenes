@@ -30,7 +30,7 @@ public class ExifToolUtil {
      */
     public synchronized String getNewPathFromTags(File file) {
         List<String> retPathName = getDataFromTags(file);
-        return propertiesResultPath + retPathName.get(0).toUpperCase() + File.separator + retPathName.get(1).toUpperCase() + File.separator + retPathName.get(2).toUpperCase();
+        return propertiesResultPath + File.separator + retPathName.get(0).toUpperCase() + File.separator + retPathName.get(1).toUpperCase() + File.separator + retPathName.get(2).toUpperCase();
     }
 
     /**
@@ -73,7 +73,7 @@ public class ExifToolUtil {
     private String getDateToPutOnTag(String filePath) throws Exception {
         final String regexReplaceColon = "[\\D]+";
         final String datePattern = "yyyy:MM:dd";
-        final String command = "exiftool";
+        final String command = System.getProperty("exiftool.path");
         final String colon = ":";
         final String regexNonZero = "\\d\\d\\d[^0]:\\d[^0]:\\d[^0]";
         final Pattern pattern = Pattern.compile(regexNonZero);
