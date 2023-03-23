@@ -1,31 +1,33 @@
 package org.arrangeImagenes.FilesUtilsLocal;
 
+import lombok.AllArgsConstructor;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+@AllArgsConstructor
 public class FilesUtilsLocal {
 
-    Logger logger = Logger.getLogger(FilesUtilsLocal.class.getName());
+    static Logger logger = Logger.getLogger(FilesUtilsLocal.class.getName());
 
     ThreadMonitor threadMonitor;
 
     String name;
 
-    public FilesUtilsLocal(ThreadMonitor threadMonitor, String name) {
-        this.threadMonitor = threadMonitor;
-        this.name = name;
-    }
+    String resultPath;
+    File file;
 
     /**
      * @param files
      */
     public void iteratePath(List<File> files) {
-        ExifToolUtil exifToolUtil = new ExifToolUtil();
+        ExifToolUtil exifToolUtil = new ExifToolUtil(resultPath,file);
         for (File activeFile : files) {
             if (!activeFile.isDirectory()) {
                 threadMonitor.addProgress();
