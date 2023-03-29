@@ -1,18 +1,17 @@
 package org.arrangeImagenes.FilesUtilsLocal;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import lombok.extern.java.Log;
 
+@Log
 public class ThreadMonitor {
-    static Logger logger = Logger.getLogger(ThreadMonitor.class.getName());
     int total;
     int progress;
 
     public ThreadMonitor(int total) {
-        logger.log(Level.INFO, "Start monitor");
+        log.info("Start monitor");
         this.progress = 0;
         this.total = total;
-        logger.log(Level.INFO, "values total: " + total + " progress:" + progress);
+        log.info("values total: " + total + " progress:" + progress);
     }
 
     public synchronized void addProgress() {

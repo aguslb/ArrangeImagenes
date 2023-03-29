@@ -1,20 +1,17 @@
 package org.arrangeImagenes.FilesUtilsLocal;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.java.Log;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
-import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 @AllArgsConstructor
+@Log
 public class FilesUtilsLocal {
-
-    static Logger logger = Logger.getLogger(FilesUtilsLocal.class.getName());
 
     ThreadMonitor threadMonitor;
 
@@ -27,7 +24,7 @@ public class FilesUtilsLocal {
      * @param files
      */
     public void iteratePath(List<File> files) {
-        ExifToolUtil exifToolUtil = new ExifToolUtil(resultPath,file);
+        ExifToolUtil exifToolUtil = new ExifToolUtil(resultPath, file);
         for (File activeFile : files) {
             if (!activeFile.isDirectory()) {
                 threadMonitor.addProgress();
@@ -45,10 +42,10 @@ public class FilesUtilsLocal {
                 if (created) {
                     moved = copyFile(activeFile, new File(newPath + File.separator + newFileName));
                 } else {
-                    logger.log(Level.WARNING, "path not created " + newPath);
+                    log.warning("path not created " + newPath);
                 }
                 if (!moved) {
-                    logger.log(Level.WARNING, "file not moved " + activeFile.getName());
+                    log.warning("file not moved " + activeFile.getName());
                 }
             }
         }
@@ -88,7 +85,7 @@ public class FilesUtilsLocal {
                     fileTo.toPath(),
                     StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
-            logger.log(Level.WARNING, e.getMessage());
+            log.warning(e.getMessage());
             return false;
         }
         return true;
