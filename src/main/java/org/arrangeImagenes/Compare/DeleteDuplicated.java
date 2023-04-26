@@ -45,10 +45,19 @@ public class DeleteDuplicated {
     private List<Path> calculateListOfDirectories(String workingPath) {
         List<Path> localFiles = new ArrayList<>();
         try {
-            localFiles = Files.walk(Path.of(workingPath)).filter(Files::isDirectory).collect(Collectors.toList());
+            localFiles = Files.walk(Path.of(workingPath)).filter(Files::isDirectory).filter(DeleteDuplicated::checkIfEmpty).collect(Collectors.toList());
         } catch (IOException ioException) {
             log.severe("Error getting the list off Files");
         }
         return localFiles;
+    }
+
+    private static boolean checkIfEmpty(Path directory) {
+        try {
+            return Files.list(directory)
+                    .anyMatch(p -> !Files.isDirectory(p));
+        } catch (IOException e) {
+            return false;
+        }
     }
 }
