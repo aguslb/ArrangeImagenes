@@ -1,15 +1,15 @@
 package org.arrangeImagenes.FilesUtilsLocal;
 
+import lombok.extern.java.Log;
+
 import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+@Log
 public class PhotoManagerThreaded implements Runnable {
-    static Logger logger = Logger.getLogger(PhotoManagerThreaded.class.getName());
     List<Path> path;
     ThreadMonitor threadMonitor;
     String name;
@@ -37,7 +37,7 @@ public class PhotoManagerThreaded implements Runnable {
      */
     @Override
     public void run() {
-        logger.log(Level.INFO, name + "---> thread" + MSG_INIT);
+        log.info(name + "---> thread" + MSG_INIT);
         FilesUtilsLocal filesUtilsLocal = new FilesUtilsLocal(threadMonitor, name, resultPath, file);
         filesUtilsLocal.iteratePath(path.stream().map(Path::toFile).collect(Collectors.toList()));
     }

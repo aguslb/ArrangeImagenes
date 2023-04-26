@@ -5,6 +5,7 @@ import com.thebuzzmedia.exiftool.ExifToolBuilder;
 import com.thebuzzmedia.exiftool.Tag;
 import com.thebuzzmedia.exiftool.core.StandardTag;
 import lombok.AllArgsConstructor;
+import lombok.extern.java.Log;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.BufferedReader;
@@ -13,14 +14,12 @@ import java.io.InputStreamReader;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @AllArgsConstructor
+@Log
 public class ExifToolUtil {
-    static Logger logger = Logger.getLogger(ExifToolUtil.class.getName());
     String propertiesResultPath;
     File file;
 
@@ -60,7 +59,7 @@ public class ExifToolUtil {
             if (StringUtils.isBlank(imageSize)) imageSize = "NONE";
             returnList.add(2, imageSize);
         } catch (Exception e) {
-            logger.log(Level.SEVERE, "Exception occur when getNewNameFromTags", e);
+            log.severe("Exception occur when getNewNameFromTags: \n" + e);
         }
         return returnList;
     }
@@ -110,7 +109,7 @@ public class ExifToolUtil {
             retString = oldest.getYear() + "_" + oldest.getMonthValue() + "_" + oldest.getDayOfMonth();
             return retString;
         } catch (Exception e) {
-            logger.log(Level.SEVERE, line + " --->" + filePath);
+            log.severe(line + " ---> " + filePath);
             throw new Exception(e);
         }
     }
@@ -120,7 +119,7 @@ public class ExifToolUtil {
      * @return
      * @throws Exception
      */
-    private  Map<Tag, String> parse(File image) throws Exception {
+    private Map<Tag, String> parse(File image) throws Exception {
         // ExifTool path must be defined as a system property (`exiftool.path`),
         // but path can be set using `withPath` method.
         try (ExifTool exifTool = new ExifToolBuilder().build()) {

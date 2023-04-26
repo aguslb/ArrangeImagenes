@@ -1,6 +1,7 @@
 package org.arrangeImagenes.FilesUtilsLocal;
 
 import lombok.Getter;
+import lombok.extern.java.Log;
 import org.arrangeImagenes.ReadProperties;
 
 import java.io.File;
@@ -12,14 +13,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @Getter
+@Log
 public class Setting {
-
-    static Logger logger = Logger.getLogger(Setting.class.getName());
 
     private final int totalPathFiles;
 
@@ -38,7 +36,7 @@ public class Setting {
     private final List<Path> files;
 
     public Setting(String os) {
-        logger.log(Level.INFO, "Setting up properties");
+        log.info("Setting up properties");
         Properties properties = ReadProperties.readPropertiesFile(os);
         File dirResult = new File(properties.getProperty("RESULT_PATH"));
         if (!dirResult.exists())
@@ -52,17 +50,17 @@ public class Setting {
         filesPerThread = Integer.divideUnsigned(getTotalPathFiles(), getMaxThreads());
         exifToolFile = new File(properties.getProperty("exiftool.path"));
 
-        logger.log(Level.INFO, "Properties for this run: ");
-        logger.log(Level.INFO, " -Local OS prop:");
+        log.info("Properties for this run: ");
+        log.info(" -Local OS prop:");
         for (Map.Entry<Object, Object> propName : properties.entrySet()) {
-            logger.log(Level.INFO, " --" + propName.getKey() + " : " + propName.getValue());
+            log.info(" --" + propName.getKey() + " : " + propName.getValue());
         }
-        logger.log(Level.INFO, "\n-scramblePath: " + scramblePath);
-        logger.log(Level.INFO, "-resultPath: " + resultPathString);
-        logger.log(Level.INFO, "-originalPath: " + originalPath);
-        logger.log(Level.INFO, "-totalPathFiles: " + totalPathFiles);
-        logger.log(Level.INFO, "-maxThreads: " + maxThreads);
-        logger.log(Level.INFO, "-filesPerThread: " + filesPerThread);
+        log.info("\n-scramblePath: " + scramblePath);
+        log.info("-resultPath: " + resultPathString);
+        log.info("-originalPath: " + originalPath);
+        log.info("-totalPathFiles: " + totalPathFiles);
+        log.info("-maxThreads: " + maxThreads);
+        log.info("-filesPerThread: " + filesPerThread);
     }
 
     private List<Path> calculateListOfFiles() {
@@ -70,7 +68,7 @@ public class Setting {
         try {
             localFiles = Files.walk(getOriginalPath()).filter(Files::isRegularFile).collect(Collectors.toList());
         } catch (IOException ioException) {
-            logger.log(Level.SEVERE, "Error getting the list off Files");
+            log.severe("Error getting the list off Files");
         }
         return localFiles;
     }
