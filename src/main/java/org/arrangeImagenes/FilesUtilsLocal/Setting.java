@@ -25,7 +25,7 @@ public class Setting {
 
     private final int filesPerThread;
 
-    private final String scramblePath;
+    private final String originalPathString;
 
     private final String resultPathString;
 
@@ -39,15 +39,14 @@ public class Setting {
         log.info("Setting up properties");
         Properties properties = ReadProperties.readPropertiesFile(os);
         File dirResult = new File(properties.getProperty("RESULT_PATH"));
-        if (!dirResult.exists())
-            FilesUtilsLocal.createPath(dirResult.getAbsolutePath());
-        scramblePath = properties.getProperty("ORIGINAL_PATH");
+        if (!dirResult.exists()) FilesUtilsLocal.createPath(dirResult.getAbsolutePath());
+        originalPathString = properties.getProperty("ORIGINAL_PATH");
         resultPathString = dirResult.getAbsolutePath();
-        originalPath = Paths.get(getScramblePath());
+        originalPath = Paths.get(getOriginalPathString());
         files = calculateListOfFiles();
         totalPathFiles = files.size();
         maxThreads = Integer.parseUnsignedInt(properties.getProperty("MAX_THREADS"));
-        filesPerThread = Integer.divideUnsigned(getTotalPathFiles(), getMaxThreads());
+        filesPerThread = getPerThread();
         exifToolFile = new File(properties.getProperty("exiftool.path"));
 
         log.info("Properties for this run: ");
@@ -55,12 +54,15 @@ public class Setting {
         for (Map.Entry<Object, Object> propName : properties.entrySet()) {
             log.info(" --" + propName.getKey() + " : " + propName.getValue());
         }
-        log.info("\n-scramblePath: " + scramblePath);
-        log.info("-resultPath: " + resultPathString);
-        log.info("-originalPath: " + originalPath);
+        log.info("\n-originalPath: " + getOriginalPathString());
+        log.info("-resultPath: " + getResultPathString());
         log.info("-totalPathFiles: " + totalPathFiles);
         log.info("-maxThreads: " + maxThreads);
         log.info("-filesPerThread: " + filesPerThread);
+    }
+
+    private int getPerThread() {
+        return  (int) Math.ceil(Math.sqrt(getTotalPathFiles()));
     }
 
     private List<Path> calculateListOfFiles() {

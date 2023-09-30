@@ -18,8 +18,6 @@ public class PhotoManagerThreaded implements Runnable {
     private Thread t;
     private final static String MSG_INIT = " -----> START";
 
-    private final static String MSG_END = " -----> DONE";
-
     /**
      * @param path
      * @param threadMonitor
@@ -37,7 +35,7 @@ public class PhotoManagerThreaded implements Runnable {
      */
     @Override
     public void run() {
-        log.info(name + "---> thread" + MSG_INIT);
+        log.info(name + " ---> thread" + MSG_INIT);
         FilesUtilsLocal filesUtilsLocal = new FilesUtilsLocal(threadMonitor, name, resultPath, file);
         filesUtilsLocal.iteratePath(path.stream().map(Path::toFile).collect(Collectors.toList()));
     }

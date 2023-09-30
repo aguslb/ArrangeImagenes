@@ -37,9 +37,10 @@ public class CompareSameSizeImage {
                     diff = diff + data;
                 }
             }
-            double avg = diff / (w1 * h1 * 3);
+            double avg = (double) diff / (w1 * h1 * 3);
             double percentage = (avg / 255) * 100;
-            log.warning("Difference: " + percentage);
+            if (percentage >= 90)
+                log.warning("Difference: " + percentage);
             return percentage;
         }
         log.warning("Both images should have same dimensions");
