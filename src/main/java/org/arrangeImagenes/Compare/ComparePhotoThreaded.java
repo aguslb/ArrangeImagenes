@@ -5,57 +5,68 @@ import org.arrangeImagenes.FilesUtilsLocal.ThreadMonitor;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Stream;
 
 @Log
 public class ComparePhotoThreaded implements Runnable {
     private Thread t;
     String name;
-    List<Path> pathList;
+    List<String> path;
 
     ThreadMonitor threadMonitor;
 
-    public ComparePhotoThreaded(List<Path> path, ThreadMonitor threadMonitor) {
-        this.pathList = path;
+    public ComparePhotoThreaded(List<String> path, ThreadMonitor threadMonitor) {
+        this.path = path;
         this.name = UUID.randomUUID().toString();
         this.threadMonitor = threadMonitor;
     }
 
     @Override
     public void run() {
-        CompareSameSizeImage compareSameSizeImage = new CompareSameSizeImage();
-        List<File> fileList = getFileListFromPathList(pathList);
-        for (int i = 0; i < fileList.size(); i++) {
-            File initFile = fileList.get(i);
-            for (int j = 1; j < fileList.size(); j++) {
-                try {
-                    double percentage = compareSameSizeImage.compareSameSizeImage(initFile, fileList.get(j));
-                    if (percentage > 97) {
-                        fileList.get(j).delete();
-                    }
-                } catch (IOException e) {
-                    log.severe("run::Something went wrong: " + e.getMessage());
+        for (String stringPath : path) {
+            CompareSameSizeImage compareSameSizeImage = new CompareSameSizeImage();
+            List<File> fileList = getFileListFromPathList(Path.of(stringPath));
+            List<File> toDelete = new ArrayList<>();
+            for (int i = 0; i < fileList.size(); i++) {
+                log.info(stringPath + " <------" + i + "------- " + name + " - " + fileList.size());
+                File initFile = fileList.get(i);
+                if (!toDelete.isEmpty() && toDelete.stream().filter(file -> file.getName().equalsIgnoreCase(initFile.getName())).findFirst().isEmpty()) {
+                    continue;
                 }
+                for (int j = 1; j < fileList.size(); j++) {
+                    double percentage = compareSameSizeImage.compareSameSizeImage(initFile, fileList.get(j), name);
+                    if (percentage <= 5) {
+                        toDelete.add(fileList.get(j));
+                    }
+                }
+            }
+            int x = 0;
+            for (File file : toDelete) {
+                if (file.delete())
+                    log.info("Ok " + x);
+                log.info("no ok " + x);
+                x++;
             }
         }
     }
 
-    private List<File> getFileListFromPathList(List<Path> pathList) {
-        List<File> retList = new ArrayList<>();
-        for (Path p : pathList) {
-            try (Stream<Path> paths = Files.walk(Paths.get(p.toAbsolutePath().toString()))) {
-                paths.filter(Files::isRegularFile).forEach(path -> retList.add(path.toFile()));
-            } catch (IOException e) {
-                log.severe("getFileListFromPathList::Something went wrong: " + e.getMessage());
+    private List<File> getFileListFromPathList(Path path) {
+        List<File> fileSet = new ArrayList<>();
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(path)) {
+            for (Path activePath : stream) {
+                if (!Files.isDirectory(activePath)) {
+                    fileSet.add(activePath.toFile());
+                }
             }
+        } catch (IOException ioException) {
+            log.warning("Error en getFileListFromPathList " + name);
         }
-        return retList;
+        return fileSet;
     }
 
     public void start() {
