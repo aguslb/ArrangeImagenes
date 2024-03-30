@@ -11,38 +11,39 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 
 @Log
 public class ComparePhotoThreaded implements Runnable {
     private Thread t;
     String name;
-    List<String> path;
 
+    File[] filesList;
     ThreadMonitor threadMonitor;
 
-    public ComparePhotoThreaded(List<String> path, ThreadMonitor threadMonitor) {
-        this.path = path;
+    public ComparePhotoThreaded(File[] filesList, ThreadMonitor threadMonitor) {
+        this.filesList = filesList;
         this.name = UUID.randomUUID().toString();
         this.threadMonitor = threadMonitor;
     }
 
     @Override
     public void run() {
-        for (String stringPath : path) {
-            CompareSameSizeImage compareSameSizeImage = new CompareSameSizeImage();
-            List<File> fileList = getFileListFromPathList(Path.of(stringPath));
-            List<File> toDelete = new ArrayList<>();
-            for (int i = 0; i < fileList.size(); i++) {
-                log.info(stringPath + " <------" + i + "------- " + name + " - " + fileList.size());
-                File initFile = fileList.get(i);
-                if (!toDelete.isEmpty() && toDelete.stream().filter(file -> file.getName().equalsIgnoreCase(initFile.getName())).findFirst().isEmpty()) {
-                    continue;
-                }
-                for (int j = 1; j < fileList.size(); j++) {
-                    double percentage = compareSameSizeImage.compareSameSizeImage(initFile, fileList.get(j), name);
-                    if (percentage <= 5) {
-                        toDelete.add(fileList.get(j));
+        CompareSameSizeImage compareSameSizeImage = new CompareSameSizeImage();
+        for (int i = 0; i < filesList.length; i++) {
+            File initFile = filesList[i];
+            for (int j = 1; j < filesList.length; j++) {
+                try {
+                    if (initFile != null && filesList[j] != null) {
+                        double percentage = compareSameSizeImage.compareSameSizeImage(initFile, filesList[j]);
+                        if (percentage == 0) {
+                            filesList[j].delete();
+                        }
                     }
+                } catch (Exception e) {
+                    log.severe("run::Something went wrong: " + e.getMessage());
                 }
             }
             int x = 0;
@@ -54,7 +55,7 @@ public class ComparePhotoThreaded implements Runnable {
             }
         }
     }
-
+  
     private List<File> getFileListFromPathList(Path path) {
         List<File> fileSet = new ArrayList<>();
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(path)) {
@@ -68,7 +69,6 @@ public class ComparePhotoThreaded implements Runnable {
         }
         return fileSet;
     }
-
     public void start() {
         if (t == null) {
             t = new Thread(this);
