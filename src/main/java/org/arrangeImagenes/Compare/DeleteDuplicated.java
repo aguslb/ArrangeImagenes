@@ -17,6 +17,9 @@ import java.util.stream.Stream;
 
 import static java.nio.file.Files.walk;
 
+import java.util.List;
+
+
 @AllArgsConstructor
 @Log
 public class DeleteDuplicated {
@@ -57,6 +60,7 @@ public class DeleteDuplicated {
             return Files.list(directory).anyMatch(p -> !Files.isDirectory(p));
         } catch (IOException e) {
             return false;
+
         }
     }
 

@@ -1,7 +1,9 @@
 package org.arrangeImagenes.FilesUtilsLocal;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.java.Log;
+import org.apache.commons.lang3.StringUtils;
 import org.arrangeImagenes.ReadProperties;
 
 import java.io.File;
@@ -14,9 +16,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-@Getter
 @Log
+@Getter
+@AllArgsConstructor
 public class Setting {
 
     private final int totalPathFiles;
@@ -35,6 +39,8 @@ public class Setting {
 
     private final List<Path> files;
 
+    private final List<String> stringListPathDuplicates ;
+
     public Setting(String os) {
         log.info("Setting up properties");
         Properties properties = ReadProperties.readPropertiesFile(os);
@@ -43,6 +49,7 @@ public class Setting {
         originalPathString = properties.getProperty("ORIGINAL_PATH");
         resultPathString = dirResult.getAbsolutePath();
         originalPath = Paths.get(getOriginalPathString());
+        stringListPathDuplicates = getListFrom((String) properties.get("LIST_DUPLICATES_PATH"));
         files = calculateListOfFiles();
         totalPathFiles = files.size();
         maxThreads = Integer.parseUnsignedInt(properties.getProperty("MAX_THREADS"));
@@ -59,6 +66,16 @@ public class Setting {
         log.info("-totalPathFiles: " + totalPathFiles);
         log.info("-maxThreads: " + maxThreads);
         log.info("-filesPerThread: " + filesPerThread);
+    }
+
+    private List<String> getListFrom(String listDuplicatesPath) {
+        List<String> ret = new ArrayList<>();
+        try {
+            Files.walk(Path.of(listDuplicatesPath)).filter(Files::isDirectory).forEach( f -> ret.add(f.toFile().getAbsolutePath()));
+           } catch (IOException ioException) {
+        log.severe("Error getting the list off Files");
+    }
+        return ret;
     }
 
     private int getPerThread() {

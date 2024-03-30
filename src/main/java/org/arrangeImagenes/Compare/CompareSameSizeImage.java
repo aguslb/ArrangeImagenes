@@ -36,14 +36,16 @@ public class CompareSameSizeImage {
                     //sum of differences of RGB values of the two images
                     long data = Math.abs(r1 - r2) + Math.abs(g1 - g2) + Math.abs(b1 - b2);
                     diff = diff + data;
+
                 }
+                double avg = (double) diff / (w1 * h1 * 3);
+                return (avg / 255) * 100;
             }
             double avg = (double) diff / (w1 * h1 * 3);
             double percentage = (avg / 255) * 100;
             log.info("Difference: " + percentage);
             return percentage;
         }
-        log.warning("Both images should have same dimensions");
-        return 0;
+        return 500;
     }
 }
