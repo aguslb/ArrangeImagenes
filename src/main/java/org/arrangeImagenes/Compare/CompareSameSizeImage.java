@@ -10,7 +10,8 @@ import java.io.IOException;
 
 @Log
 public class CompareSameSizeImage {
-    public double compareSameSizeImage(File file1, File file2) throws IOException {
+    public double compareSameSizeImage(File file1, File file2) throws Exception {
+        log.info(file1.getName() + "   " + file2.getName());
         BufferedImage img1 = ImageIO.read(file1);
         BufferedImage img2 = ImageIO.read(file2);
         int w1 = img1.getWidth();
@@ -39,8 +40,7 @@ public class CompareSameSizeImage {
             }
             double avg = (double) diff / (w1 * h1 * 3);
             double percentage = (avg / 255) * 100;
-            if (percentage >= 90)
-                log.warning("Difference: " + percentage);
+            log.info("Difference: " + percentage);
             return percentage;
         }
         log.warning("Both images should have same dimensions");
