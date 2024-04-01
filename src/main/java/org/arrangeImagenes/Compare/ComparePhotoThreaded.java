@@ -11,8 +11,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 
 @Log
@@ -46,16 +44,9 @@ public class ComparePhotoThreaded implements Runnable {
                     log.severe("run::Something went wrong: " + e.getMessage());
                 }
             }
-            int x = 0;
-            for (File file : toDelete) {
-                if (file.delete())
-                    log.info("Ok " + x);
-                log.info("no ok " + x);
-                x++;
-            }
         }
     }
-  
+
     private List<File> getFileListFromPathList(Path path) {
         List<File> fileSet = new ArrayList<>();
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(path)) {
@@ -69,6 +60,7 @@ public class ComparePhotoThreaded implements Runnable {
         }
         return fileSet;
     }
+
     public void start() {
         if (t == null) {
             t = new Thread(this);

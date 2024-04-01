@@ -27,7 +27,7 @@ public class ExifToolUtil {
      * @param file
      * @return
      */
-    public synchronized String getNewPathFromTags(File file) {
+    public String getNewPathFromTags(File file) {
         List<String> retPathName = getDataFromTags(file);
         return propertiesResultPath + File.separator + retPathName.get(0).toUpperCase() + File.separator + retPathName.get(1).toUpperCase() + File.separator + retPathName.get(2).toUpperCase();
     }
@@ -36,7 +36,7 @@ public class ExifToolUtil {
      * @param file
      * @return
      */
-    public synchronized String getNewNameFromTags(File file) {
+    public String getNewNameFromTags(File file) {
         List<String> retPathName = getDataFromTags(file);
         return retPathName.get(1).toUpperCase() + UUID.randomUUID().toString().toUpperCase() + "." + retPathName.get(0);
     }

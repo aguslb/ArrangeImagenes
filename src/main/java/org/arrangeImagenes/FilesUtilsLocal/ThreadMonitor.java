@@ -1,8 +1,12 @@
 package org.arrangeImagenes.FilesUtilsLocal;
 
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.java.Log;
 
 @Log
+@Setter
+@Getter
 public class ThreadMonitor {
     int total;
     int progress;
@@ -16,22 +20,6 @@ public class ThreadMonitor {
 
     public synchronized void addProgress() {
         progress++;
-    }
-
-    public synchronized void setProgress(int progress) {
-        this.progress = progress;
-    }
-
-    public synchronized int getProgress() {
-        return progress;
-    }
-
-    public void setTotal(int total) {
-        this.total = total;
-    }
-
-    public synchronized int getTotal() {
-        return total;
     }
 
     public int getIntProgress() {

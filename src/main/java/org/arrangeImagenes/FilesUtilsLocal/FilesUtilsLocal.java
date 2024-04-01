@@ -6,8 +6,14 @@ import lombok.extern.java.Log;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static java.nio.file.Files.*;
 
 @AllArgsConstructor
 @Log
@@ -19,6 +25,11 @@ public class FilesUtilsLocal {
 
     String resultPath;
     File file;
+
+    public static int getNumberOfThreads(int listSize, int totalFilesPerThread) {
+        return (int) Math.ceil((double) listSize / totalFilesPerThread);
+    }
+
 
     /**
      * @param files
@@ -62,26 +73,13 @@ public class FilesUtilsLocal {
     }
 
     /**
-     * @param from
-     * @param to
-     * @return
-     */
-    public static boolean moveFile(File from, File to) {
-        // renaming the file and moving it to a new location
-        // if file copied successfully then delete the original file
-        if (from.renameTo(to))
-            return from.delete();
-        return false;
-    }
-
-    /**
      * @param fileFrom
      * @param fileTo
      * @return
      */
     public synchronized boolean copyFile(File fileFrom, File fileTo) {
         try {
-            Files.copy(fileFrom.toPath(),
+            copy(fileFrom.toPath(),
                     fileTo.toPath(),
                     StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
@@ -89,5 +87,38 @@ public class FilesUtilsLocal {
             return false;
         }
         return true;
+    }
+
+    public static int getFilesPerThread(int totalPathFiles) {
+        return (int) Math.ceil(Math.sqrt(totalPathFiles));
+    }
+
+    public static List<Path> listOfRegularFiles(Path originPath) {
+        List<Path> localFiles = new ArrayList<>();
+        try {
+            localFiles = list(Paths.get(originPath.toString())).filter(Files::isRegularFile).collect(Collectors.toList());
+        } catch (IOException ioException) {
+            log.severe("Error getting the list off Files");
+        }
+        return localFiles;
+    }
+
+    public static List<Path> listOfDirectories(Path originPath) {
+        List<Path> localFiles = new ArrayList<>();
+        try {
+            localFiles = walk(originPath).filter(Files::isDirectory).collect(Collectors.toList());
+        } catch (IOException ioException) {
+            log.severe("Error getting the list off directories");
+        }
+        return localFiles;
+    }
+
+    public static int totalOfFiles(Path originPath) {
+        try {
+            return Files.walk(originPath).filter(Files::isRegularFile).collect(Collectors.toList()).size();
+        } catch (IOException ioException) {
+            log.severe("Error getting the list off Files");
+        }
+        return 0;
     }
 }
