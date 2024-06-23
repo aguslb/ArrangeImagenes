@@ -48,3 +48,5 @@ gradle-app.setting
 
 .gradle/**
 .idea/**
+.DS_Store
+._.git
