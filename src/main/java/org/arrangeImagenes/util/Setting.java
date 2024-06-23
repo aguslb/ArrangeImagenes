@@ -1,9 +1,9 @@
-package org.arrangeImagenes.FilesUtilsLocal;
+package org.arrangeImagenes.util;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.java.Log;
-import org.arrangeImagenes.ReadProperties;
+import org.arrangeImagenes.FilesUtilsLocal.FilesUtilsLocal;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -22,8 +22,6 @@ public class Setting {
 
     private final Path originalPath;
 
-    private final File exifToolFile;
-
     public Setting(String os) {
         log.info("Setting up properties");
         Properties properties = ReadProperties.readPropertiesFile(os);
@@ -32,7 +30,6 @@ public class Setting {
         originalPathString = properties.getProperty("ORIGINAL_PATH");
         resultPathString = dirResult.getAbsolutePath();
         originalPath = Paths.get(getOriginalPathString());
-        exifToolFile = new File(properties.getProperty("exiftool.path"));
         log.info("Properties for this run: ");
         log.info(" -Local OS prop:");
         for (Map.Entry<Object, Object> propName : properties.entrySet()) {

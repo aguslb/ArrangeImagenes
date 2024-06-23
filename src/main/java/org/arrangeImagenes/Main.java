@@ -2,8 +2,7 @@ package org.arrangeImagenes;
 
 import lombok.extern.java.Log;
 import org.arrangeImagenes.Arrange.ArrangeFiles;
-import org.arrangeImagenes.Compare.DeleteDuplicated;
-import org.arrangeImagenes.FilesUtilsLocal.Setting;
+import org.arrangeImagenes.util.Setting;
 
 import java.util.Scanner;
 
@@ -16,15 +15,12 @@ public class Main {
         String line = "";
         while (!line.equalsIgnoreCase("x")) {
             Scanner keyboard = new Scanner(System.in);
-            log.severe("Enter an option:");
-            log.severe("A: for arrange images");
-            log.severe("D: for duplicate");
-            log.severe("X: for exit");
+            System.out.println("Enter an option:");
+            System.out.println("A: for arrange images");
+            System.out.println("X: for exit");
             line = keyboard.nextLine();
             if (line.equalsIgnoreCase("A")) {
                 runArrange(setting);
-            } else if (line.equalsIgnoreCase("D")) {
-                runDuplicated(setting);
             }
         }
     }
@@ -35,9 +31,4 @@ public class Main {
         arrangeFiles.arrangeFiles();
     }
 
-    public static void runDuplicated(Setting setting) {
-        log.warning("Start Duplicated");
-        DeleteDuplicated deleteDuplicated = new DeleteDuplicated(setting);
-        deleteDuplicated.deleteDuplicateImagesSamePath();
-    }
 }
