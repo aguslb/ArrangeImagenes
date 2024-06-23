@@ -1,4 +1,4 @@
-package org.arrangeImagenes;
+package org.arrangeImagenes.util;
 
 import lombok.extern.java.Log;
 
@@ -11,7 +11,7 @@ import java.util.Properties;
 @Log
 public class ReadProperties {
 
-    private static final String WIN_APP_PROP = "C:\\Users\\zid_0\\Projects\\ArrangeImagenes\\src\\main\\resources\\application-win.properties";
+    private static final String WIN_APP_PROP = "C:\\Users\\zid_0\\Documents\\Projects\\ArrangeImagenes\\src\\main\\resources\\application-win.properties";
     private static final String UNIX_APP_PROP = "/Users/agusmac/Proyectos/ArrangeImagenes/src/main/resources/application-unix.properties";
 
     private static final String MACOSX_APP_PROP = "/Users/agus/Proyectos/ArrangeImagenes/src/main/resources/application-osx.properties";

@@ -2,6 +2,7 @@ package org.arrangeImagenes.FilesUtilsLocal;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
+import org.arrangeImagenes.metadataExt.MetadataUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,79 +22,50 @@ public class FilesUtilsLocal {
 
     ThreadMonitor threadMonitor;
 
-    String name;
-
-    String resultPath;
-    File file;
-
     public static int getNumberOfThreads(int listSize, int totalFilesPerThread) {
         return (int) Math.ceil((double) listSize / totalFilesPerThread);
     }
 
-
-    /**
-     * @param files
-     */
-    public void iteratePath(List<File> files) {
-        ExifToolUtil exifToolUtil = new ExifToolUtil(resultPath, file);
+    public synchronized void iteratePathMeta(List<File> files, MetadataUtil metadataUtil, String name) {
+        int i = 0;
         for (File activeFile : files) {
             if (!activeFile.isDirectory()) {
+                i++;
                 threadMonitor.addProgress();
-                System.out.print(name + " -------> " + threadMonitor.getIntProgress() + "\r");
-                String newPath = exifToolUtil.getNewPathFromTags(activeFile);
-                String newFileName = exifToolUtil.getNewNameFromTags(activeFile);
+                String newPath = metadataUtil.getStrFromTags(activeFile, true);
+                String newFileName = metadataUtil.getStrFromTags(activeFile, false);
                 File fileDir = new File(newPath, newFileName);
-                boolean created;
-                boolean moved = false;
+                System.out.print(name + " ** tf: " + i + " -------> " + threadMonitor.getIntProgress() + "\r");
                 if (!fileDir.getParentFile().exists()) {
-                    created = createPath(newPath);
-                } else {
-                    created = true;
+                    createPath(newPath);
                 }
-                if (created) {
-                    moved = copyFile(activeFile, new File(newPath + File.separator + newFileName));
-                } else {
-                    log.warning("path not created " + newPath);
-                }
-                if (!moved) {
-                    log.warning("file not moved " + activeFile.getName());
-                }
+                copyFile(activeFile, new File(newPath + File.separator + newFileName));
             }
         }
     }
 
-    /**
-     * @param path
-     * @return
-     */
-    public synchronized static boolean createPath(String path) {
+    public synchronized static void createPath(String path) {
         File theDir = new File(path);
-        if (!theDir.exists()) return theDir.mkdirs();
-        return false;
+        if (!theDir.exists()) {
+            theDir.mkdirs();
+        }
     }
 
-    /**
-     * @param fileFrom
-     * @param fileTo
-     * @return
-     */
-    public synchronized boolean copyFile(File fileFrom, File fileTo) {
+    public synchronized void copyFile(File fileFrom, File fileTo) {
         try {
             copy(fileFrom.toPath(),
                     fileTo.toPath(),
                     StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             log.warning(e.getMessage());
-            return false;
         }
-        return true;
     }
 
-    public static int getFilesPerThread(int totalPathFiles) {
+    public synchronized static int getFilesPerThread(int totalPathFiles) {
         return (int) Math.ceil(Math.sqrt(totalPathFiles));
     }
 
-    public static List<Path> listOfRegularFiles(Path originPath) {
+    public synchronized static List<Path> listOfRegularFiles(Path originPath) {
         List<Path> localFiles = new ArrayList<>();
         try {
             localFiles = list(Paths.get(originPath.toString())).filter(Files::isRegularFile).collect(Collectors.toList());
@@ -103,7 +75,7 @@ public class FilesUtilsLocal {
         return localFiles;
     }
 
-    public static List<Path> listOfDirectories(Path originPath) {
+    public synchronized static List<Path> listOfDirectories(Path originPath) {
         List<Path> localFiles = new ArrayList<>();
         try {
             localFiles = walk(originPath).filter(Files::isDirectory).collect(Collectors.toList());
@@ -113,9 +85,9 @@ public class FilesUtilsLocal {
         return localFiles;
     }
 
-    public static int totalOfFiles(Path originPath) {
+    public synchronized static int totalOfFiles(Path originPath) {
         try {
-            return Files.walk(originPath).filter(Files::isRegularFile).collect(Collectors.toList()).size();
+            return Files.walk(originPath).filter(Files::isRegularFile).toList().size();
         } catch (IOException ioException) {
             log.severe("Error getting the list off Files");
         }
