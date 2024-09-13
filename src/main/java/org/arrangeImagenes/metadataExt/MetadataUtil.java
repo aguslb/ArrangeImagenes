@@ -38,32 +38,37 @@ public class MetadataUtil {
     }
 
     public String getStrFromTags(File file, boolean isPath) {
+        String ext = getFileExtension(file.getName()).toLowerCase();
         try {
             Metadata metadata = ImageMetadataReader.readMetadata(file);
             String resolutionW = "";
             String resolutionH = "";
             String date = "";
-            String ext = getFileExtension(file.getName()).toLowerCase();
 
             for (Directory directory : metadata.getDirectories()) {
                 for (Tag tag : directory.getTags()) {
                     if (tag.getTagName().contains(IMAGE_WIDTH) && StringUtils.isBlank(resolutionW)) {
-                        resolutionW = tag.getDescription().replaceAll(PIXELS, "").trim() + "x";
+                        String trimW = tag.getDescription().replaceAll(PIXELS, "").trim();
+                        int pixWidth = Integer.parseInt(trimW);
+                        resolutionW = pixWidth >= PIX_MAX_WIDTH ? trimW + "x" : null;
                     } else if (tag.getTagName().contains(IMAGE_HEIGHT) && StringUtils.isBlank(resolutionH)) {
-                        resolutionH = tag.getDescription().replaceAll(PIXELS, "").trim();
+                        String trimH = tag.getDescription().replaceAll(PIXELS, "").trim();
+                        int pixHeight = Integer.parseInt(trimH);
+                        resolutionH = pixHeight >= PIX_MAX_HEIGHT ? trimH : null;
                     } else if (tag.getTagName().contains(DATE)) {
                         date = getDate(tag.getDescription(), date);
                     }
                 }
             }
-            return isPath ? propertiesResultPath + File.separator + ext + File.separator + date + File.separator + resolutionW + resolutionH
-                    : date + "_" + UUID.randomUUID().toString().toUpperCase() + "." + ext;
+            if (StringUtils.isNotEmpty(resolutionH) || StringUtils.isNotEmpty(resolutionW)) {
+                return isPath ? propertiesResultPath + File.separator + ext + File.separator + date + File.separator + resolutionW + resolutionH
+                        : date + "_" + UUID.randomUUID().toString().toUpperCase() + "." + ext;
+            } else
+                return null;
         } catch (Exception e) {
             log.log(Level.SEVERE, file.getName() + " -- " + e.getMessage());
+            return isPath ? propertiesResultPath + File.separator + NIL : UUID.randomUUID().toString().toUpperCase() + "." + ext;
         }
-
-        return isPath ? propertiesResultPath + File.separator + NIL : NIL;
-
     }
 
     private String getDate(String line, String oldestString) {

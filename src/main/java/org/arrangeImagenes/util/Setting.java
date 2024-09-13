@@ -11,23 +11,22 @@ import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Properties;
 
+import static org.arrangeImagenes.util.Values.*;
+
 @Log
 @Getter
 @AllArgsConstructor
 public class Setting {
-
     private final String originalPathString;
-
     private final String resultPathString;
-
     private final Path originalPath;
 
     public Setting(String os) {
         log.info("Setting up properties");
         Properties properties = ReadProperties.readPropertiesFile(os);
-        File dirResult = new File(properties.getProperty("RESULT_PATH"));
+        File dirResult = new File(properties.getProperty(RESULT_PATH));
         if (!dirResult.exists()) FilesUtilsLocal.createPath(dirResult.getAbsolutePath());
-        originalPathString = properties.getProperty("ORIGINAL_PATH");
+        originalPathString = properties.getProperty(ORIGINAL_PATH);
         resultPathString = dirResult.getAbsolutePath();
         originalPath = Paths.get(getOriginalPathString());
         log.info("Properties for this run: ");

@@ -2,6 +2,7 @@ package org.arrangeImagenes.FilesUtilsLocal;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
+import org.apache.commons.lang3.StringUtils;
 import org.arrangeImagenes.metadataExt.MetadataUtil;
 
 import java.io.File;
@@ -34,12 +35,16 @@ public class FilesUtilsLocal {
                 threadMonitor.addProgress();
                 String newPath = metadataUtil.getStrFromTags(activeFile, true);
                 String newFileName = metadataUtil.getStrFromTags(activeFile, false);
-                File fileDir = new File(newPath, newFileName);
                 System.out.print(name + " ** tf: " + i + " -------> " + threadMonitor.getIntProgress() + "\r");
-                if (!fileDir.getParentFile().exists()) {
-                    createPath(newPath);
+                if (StringUtils.isNotEmpty(newPath) || StringUtils.isNotEmpty(newFileName)) {
+                    File fileDir = new File(newPath, newFileName);
+                    if (!fileDir.getParentFile().exists()) {
+                        createPath(newPath);
+                    }
+                    copyFile(activeFile, new File(newPath + File.separator + newFileName));
+                } else {
+                    log.warning("skip due low resolution boundaries \r");
                 }
-                copyFile(activeFile, new File(newPath + File.separator + newFileName));
             }
         }
     }
